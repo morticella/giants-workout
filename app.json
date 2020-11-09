@@ -1,0 +1,12 @@
+{
+  "name": "giants-workout",
+  "displayName": "giants-workout",
+  "expo": {
+    "name": "giants-workout",
+    "slug": "giants-workout",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
