@@ -34,7 +34,7 @@ export const MOCK: IWorkout = {
     warmUp: {
         isOn: true,
         duration: 3,
-        soundEffect: require('../sounds/Swoosh.mp3'),
+        soundEffect: require('../assets/sounds/Swoosh.mp3'),
         styles: {
             background: 'yellow',
         }
@@ -43,7 +43,7 @@ export const MOCK: IWorkout = {
         high: {
             isOn: true,
             duration: 3,
-            soundEffect: require('../sounds/alarm_2.mp3'),
+            soundEffect: require('../assets/sounds/alarm_2.mp3'),
             styles: {
                 background: 'red',
             }
@@ -51,7 +51,7 @@ export const MOCK: IWorkout = {
         low: {
             isOn: true,
             duration: 2,
-            soundEffect: require('../sounds/BeeperEmergencyCall.mp3'),
+            soundEffect: require('../assets/sounds/BeeperEmergencyCall.mp3'),
             styles: {
                 background: 'green',
             }
@@ -59,7 +59,7 @@ export const MOCK: IWorkout = {
         rest: {
             isOn: true,
             duration: 2,
-            soundEffect: require('../sounds/finished.wav'),
+            soundEffect: require('../assets/sounds/finished.wav'),
             styles: {
                 background: 'blue',
             }
@@ -75,7 +75,7 @@ export const workoutSettigs = {
     stop: false,
     reset: false,
     background: MOCK.warmUp.styles.background,
-    seconds: moment().minute(0).second(MOCK.warmUp.duration).format('mm : ss').toString(),
+    seconds: moment().hours(0).minute(0).second(MOCK.warmUp.duration).format('mm : ss').toString(),
     music: async (sound: AVPlaybackSource, soundObject = new Audio.Sound()) => {
         try {
             await soundObject.loadAsync(sound);
