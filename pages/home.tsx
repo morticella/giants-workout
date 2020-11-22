@@ -1,29 +1,63 @@
 import React, { useEffect } from 'react';
 import { View, Text, FlatList, AsyncStorage, StyleSheet } from "react-native"
 import { Header, Icon } from 'react-native-elements'
+import { useSelector, useDispatch } from 'react-redux';
+import { IWorkout } from 'mocks/workout';
+import { WORKOUT_TIMER } from '../assets/constants';
 
 interface IProps {
     menuCallback(): void,
 }
 let list: { key: string }[] = [];
-const workouts = async () => {
+let listStore: string[] = [];
+// AsyncStorage.clear();
+export const workouts = async () => {
+    console.log('triggered');
     list = [];
-    // AsyncStorage.clear();
+    listStore = [];
     await AsyncStorage.getAllKeys((err, keys) => {
-        AsyncStorage.multiGet(keys, (err, stores) => {
+        AsyncStorage.multiGet(keys as string[], (err, stores) => {
+            if (!stores) {
+                return;
+            }
             stores.map((result, i, store) => {
-                // get at each store's key/value so you can work with it
-                console.log('------> ', store[i][0], store[i][1]);
-                list.push({ key: store[i][0] });
+                if (store[i][0].includes('WORKOUT')) {
+                    listStore.push(store[i][1]);
+                }
+
             });
         });
     });
+    return { listStore, list };
 }
-// workouts();
 export const Home: React.FC<IProps> = (props: IProps) => {
+    const dispatch = useDispatch();
+    const persistWorkouts = useSelector(state => state?.workouts?.workouts)
     useEffect(() => {
-        workouts();
-    });
+        // workouts();
+        setTimeout(() => {
+            dispatch({ type: 'fetchWorkouts', workouts: persistWorkouts });
+        }, 200);
+    }, []);
+
+    const workoutsState: IWorkout[] = useSelector(state => state?.workouts?.workouts) || [];
+
+    const runningWorkout: Function = (workoutName: string): IWorkout | void  => {
+        workoutsState.map((workout: IWorkout) => {
+            if (workout.name === workoutName) {
+                console.log('->', workout);
+                dispatch({ type: 'loadWorkout', workouts: workout });
+                return workout
+            }
+        })
+    };
+    useSelector(state => console.log(state));
+
+    const test: any[] = [];
+
+    workoutsState.map((workout: IWorkout) => {
+        test.push({ key: workout.name })
+    })
 
     const styles = StyleSheet.create({
         container: {
@@ -36,8 +70,6 @@ export const Home: React.FC<IProps> = (props: IProps) => {
             height: 44,
         },
     });
-    //   workouts();
-    console.log('list ', list);
     return (
         <>
             <Header
@@ -50,12 +82,22 @@ export const Home: React.FC<IProps> = (props: IProps) => {
                     backgroundColor='trasparent'
                     onPress={props.menuCallback} />}
             />
+
             <View>
                 <FlatList
-                    data={list}
-                    renderItem={({ item }) => <Text style={styles.item}>{item.key}</Text>}
+                    data={test}
+                    renderItem={({ item }) => <Text style={styles.item}>{item.key} <Icon
+                    name='chevron-right'
+                    type='font-awesome'
+                    color='#000'
+                    backgroundColor='trasparent'
+                    onPress={() => {
+                        runningWorkout(item.key);
+                        dispatch({type: WORKOUT_TIMER})
+                    }} /></Text>}
                 />
             </View>
+
         </>
     )
 }

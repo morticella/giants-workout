@@ -5,8 +5,9 @@ import Moment from 'moment';
 import { extendMoment } from 'moment-range';
 import { StartButton } from '../components/start-button';
 import { DigitalDisplay } from '../components/digital-display';
-import { MOCK, workoutSettigs } from '../mocks/workout';
+import { workoutSettigs, IWorkout } from '../mocks/workout';
 import { AVPlaybackSource } from 'expo-av/build/AV';
+import { useSelector } from 'react-redux';
 
 const moment = extendMoment(Moment);
 
@@ -24,13 +25,16 @@ interface IWorkoutSettings {
 interface IProps {
     menuCallback(): void,
 }
-
+interface IState {
+    workouts: { runningWorkout: IWorkout }
+}
 export const WorkoutTimer: React.FC<IProps> = props => {
+    const selectedWorkout = useSelector((state: IState) => state.workouts.runningWorkout);
     let i: number;
     const ONE_SECOND_IN_MS = 1000;
     const PATTERN = [1 * ONE_SECOND_IN_MS, 2 * ONE_SECOND_IN_MS, 3 * ONE_SECOND_IN_MS];
 
-    const [timer, setTimer] = useState<IWorkoutSettings>(workoutSettigs);
+    const [timer, setTimer] = useState<IWorkoutSettings>(workoutSettigs(selectedWorkout));
 
     useEffect(() => {
         if (timer.stop) {
@@ -48,15 +52,15 @@ export const WorkoutTimer: React.FC<IProps> = props => {
         let cycleType = 'high';
         let j = 0;
         let checkType = 0;
-        timer.stop || timer.reset ? i = timer.counter : i = timer.duration ? timer.duration : MOCK.intervals[0].high.duration;
+        timer.stop || timer.reset ? i = timer.counter : i = timer.duration ? timer.duration : selectedWorkout.intervals[0].high.duration;
         if (timer.start) {
             interval = setInterval(() => {
                 Vibration.vibrate(PATTERN);
                 i--;
                 setTimer(state => ({
-                        ...state,
-                        counter: i,
-                        seconds: moment().hour(0).minute(0).second(i).format('mm : ss').toString(),
+                    ...state,
+                    counter: i,
+                    seconds: moment().hour(0).minute(0).second(i).format('mm : ss').toString(),
                 }));
                 console.log('duration 2 ', i, timer.seconds);
                 if (i === -1) {
@@ -64,7 +68,7 @@ export const WorkoutTimer: React.FC<IProps> = props => {
                         j++;
                     }
                     checkType++;
-                    if (j === MOCK.intervals.length) {
+                    if (j === selectedWorkout.intervals.length) {
                         j = 0;
                     }
                     console.log('checkType ', checkType, cycleType);
@@ -73,52 +77,52 @@ export const WorkoutTimer: React.FC<IProps> = props => {
                     } else {
                         cycleType = 'high'
                     }
-                    if (checkType > MOCK.intervals[j].repeat * 2) {
+                    if (checkType > selectedWorkout.intervals[j].repeat * 2) {
                         if (checkType % 2 === 0) {
                             i = 0;
                             setTimer(state => ({
-                                    ...state,
-                                    counter: 0,
-                                    seconds: moment().hour(0).minute(0).second(0).format('mm : ss').toString(),
-                                    duration: 0,
-                                    background: 'orange',
-                                    start: false,
-                                    reset: true,
-                                    stop: false,
-                                }));
+                                ...state,
+                                counter: 0,
+                                seconds: moment().hour(0).minute(0).second(0).format('mm : ss').toString(),
+                                duration: 0,
+                                background: 'orange',
+                                start: false,
+                                reset: true,
+                                stop: false,
+                            }));
                         } else {
-                            timer.music(MOCK.intervals[j].rest.soundEffect);
-                            i = MOCK.intervals[j].rest.duration;
+                            timer.music(selectedWorkout.intervals[j].rest.soundEffect);
+                            i = selectedWorkout.intervals[j].rest.duration;
                             setTimer(state => ({
-                                    ...state,
-                                    counter: MOCK.intervals[j].rest.duration,
-                                    seconds: moment().hour(0).minute(0).second(MOCK.intervals[j].rest.duration).format('mm : ss').toString(),
-                                    duration: MOCK.intervals[j].rest.duration,
-                                    background: MOCK.intervals[j].rest.styles.background,
-                                }));
+                                ...state,
+                                counter: selectedWorkout.intervals[j].rest.duration,
+                                seconds: moment().hour(0).minute(0).second(selectedWorkout.intervals[j].rest.duration).format('mm : ss').toString(),
+                                duration: selectedWorkout.intervals[j].rest.duration,
+                                background: selectedWorkout.intervals[j].rest.styles.background,
+                            }));
                         }
                     } else {
                         if (cycleType === 'high') {
-                            timer.music(MOCK.intervals[j].high.soundEffect);
-                            i = MOCK.intervals[j].high.duration;
+                            // timer.music(selectedWorkout.intervals[j].high.soundEffect);
+                            i = selectedWorkout.intervals[j].high.duration;
                             setTimer(state => ({
-                                    ...state,
-                                    counter: MOCK.intervals[j].high.duration,
-                                    seconds: moment().hour(0).minute(0).second(MOCK.intervals[j].high.duration).format('mm : ss').toString(),
-                                    duration: MOCK.intervals[j].high.duration,
-                                    background: MOCK.intervals[j].high.styles.background,
-                                }));
+                                ...state,
+                                counter: selectedWorkout.intervals[j].high.duration,
+                                seconds: moment().hour(0).minute(0).second(selectedWorkout.intervals[j].high.duration).format('mm : ss').toString(),
+                                duration: selectedWorkout.intervals[j].high.duration,
+                                background: selectedWorkout.intervals[j].high.styles.background,
+                            }));
                         }
                         if (cycleType === 'low') {
-                            timer.music(MOCK.intervals[j].low.soundEffect);
-                            i = MOCK.intervals[j].low.duration;
+                            // timer.music(selectedWorkout.intervals[j].low.soundEffect);
+                            i = selectedWorkout.intervals[j].low.duration;
                             setTimer(state => ({
-                                    ...state,
-                                    counter: MOCK.intervals[j].low.duration,
-                                    seconds: moment().hour(0).minute(0).second(MOCK.intervals[j].low.duration).format('mm : ss').toString(),
-                                    duration: MOCK.intervals[j].low.duration,
-                                    background: MOCK.intervals[j].low.styles.background,
-                                }));
+                                ...state,
+                                counter: selectedWorkout.intervals[j].low.duration,
+                                seconds: moment().hour(0).minute(0).second(selectedWorkout.intervals[j].low.duration).format('mm : ss').toString(),
+                                duration: selectedWorkout.intervals[j].low.duration,
+                                background: selectedWorkout.intervals[j].low.styles.background,
+                            }));
                         }
                     }
                 }
@@ -130,28 +134,28 @@ export const WorkoutTimer: React.FC<IProps> = props => {
     }, [timer.start]);
 
     const handleStart = () => {
-        timer.music(MOCK.warmUp.soundEffect);
+        timer.music(selectedWorkout.warmUp.soundEffect);
         setTimer(state => ({
-                ...state,
-                start: true,
-                reset: false,
-            }));
+            ...state,
+            start: true,
+            reset: false,
+        }));
         Vibration.vibrate(PATTERN);
     }
     const handleStop = () => {
         setTimer(state => ({
-                ...state,
-                start: false,
-                reset: false,
-                stop: true,
-            }));
+            ...state,
+            start: false,
+            reset: false,
+            stop: true,
+        }));
     }
     const handleReset = () => {
-        i = MOCK.warmUp.duration;
+        i = selectedWorkout.warmUp.duration;
         setTimer({
-                ...workoutSettigs,
-                reset: true,
-            });
+            ...workoutSettigs(selectedWorkout),
+            reset: true,
+        });
     }
 
     const styles = StyleSheet.create({
@@ -169,18 +173,18 @@ export const WorkoutTimer: React.FC<IProps> = props => {
 
     return (
         <>
-        <Header
-        containerStyle={{backgroundColor: timer.background, borderBottomColor: timer.background}}
-        leftComponent={{ icon: 'menu', color: '#fff' }}
-        centerComponent={{ text: MOCK.name, style: { color: '#fff' } }}
-        rightComponent={<Icon
-          // raised
-          name='gear'
-          type='font-awesome'
-          color='#fff'
-          backgroundColor='trasparent'
-          onPress={props.menuCallback} />} 
-      />
+            <Header
+                containerStyle={{ backgroundColor: timer.background, borderBottomColor: timer.background }}
+                leftComponent={{ icon: 'menu', color: '#fff' }}
+                centerComponent={{ text: selectedWorkout.name, style: { color: '#fff' } }}
+                rightComponent={<Icon
+                    // raised
+                    name='gear'
+                    type='font-awesome'
+                    color='#fff'
+                    backgroundColor='trasparent'
+                    onPress={props.menuCallback} />}
+            />
             <View style={styles.container}>
                 <DigitalDisplay seconds={timer.seconds} />
             </View>

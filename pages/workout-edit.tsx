@@ -3,35 +3,28 @@ import { View, Text, AsyncStorage, Switch, Picker, Slider } from "react-native";
 import { Header, Icon, Input } from 'react-native-elements';
 import Moment from 'moment';
 import { extendMoment } from 'moment-range';
-import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { IWorkout, workoutSettigs } from 'mocks/workout';
 
 const moment = extendMoment(Moment);
 
 interface IProps {
     menuCallback(): void,
 }
-export const WorkoutCreate: React.FC<IProps> = (props: IProps) => {
 
-    const _retrieveData = async () => {
-        try {
-            const value = await AsyncStorage.getItem(title + 'WORKOUT');
-            if (value !== null) {
-                // We have data!!
-                // console.log('ciao >>', value);
-            }
-        } catch (error) {
-            // Error retrieving data
-        }
-    };
+interface IState {
+    workouts: { runningWorkout: IWorkout }
+}
+export const WorkoutEdit: React.FC<IProps> = (props: IProps) => {
+    const runningWorkout: IWorkout = useSelector((state:IState) => state.workouts.runningWorkout)
+
     const secondsValue = [];
     for (let i = 0; i < 60; i++) {
         secondsValue.push(
             <Picker.Item label={i < 10 ? '0' + i.toString() : i.toString()} value={i} key={i} />
         )
     }
-    // console.log('here ');
-    //  _storeData();
-    _retrieveData();
+
     const [isEnabled, setIsEnabled] = useState(false);
     const [showWarmUp, setShowWarmUp] = useState(false);
     const [showCycle, setShowCycle] = useState(false);
@@ -39,7 +32,6 @@ export const WorkoutCreate: React.FC<IProps> = (props: IProps) => {
     const [showHigh, setShowHigh] = useState(false);
     const [showRepeat, setShowRepeat] = useState(false);
     const [showCooldown, setShowCooldown] = useState(false);
-    const [title, setTitle] = useState('My new workout');
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
     const toggleSwitchWarmUp = () => setShowWarmUp(previousState => !previousState);
     const toggleCycle = () => setShowCycle(previousState => !previousState);
@@ -47,157 +39,76 @@ export const WorkoutCreate: React.FC<IProps> = (props: IProps) => {
     const toggleLow = () => setShowLow(previousState => !previousState);
     const toggleRepeat = () => setShowRepeat(previousState => !previousState);
     const toggleCooldown = () => setShowCooldown(previousState => !previousState);
-    const [seconds, setSeconds] = useState('00');
+    
+    const [seconds, setSeconds] = useState(runningWorkout.warmUp.duration.toString());
     const [minutes, setMinutes] = useState('00');
-    const [sec, setSec] = useState(0);
+    const [sec, setSec] = useState(runningWorkout.warmUp.duration);
     const [min, setMin] = useState(0);
     const [cycle, setCycle] = useState(0);
-    const [highSec, setHighSec] = useState(0);
+    const [highSec, setHighSec] = useState(runningWorkout.intervals[0].high.duration);
     const [highMin, setHighMin] = useState(0);
-    const [lowSec, setLowSec] =  useState(0);
+    const [lowSec, setLowSec] =  useState(runningWorkout.intervals[0].low.duration);
     const [lowMin, setLowMin] =  useState(0);
-    const [repeat, setRepeat] =  useState(0);
-    const [cooldownSec, setCooldownSec] =  useState(0);
+    const [repeat, setRepeat] =  useState(runningWorkout.intervals[0].repeat);
+    const [cooldownSec, setCooldownSec] =  useState(runningWorkout.intervals[0].rest.duration);
     const [cooldownMin, setCooldownMin] =  useState(0);
-const dispatch = useDispatch();
+
     const handleSave = async () => {
             try {
-                dispatch({ type: 'createWorkout', workouts: {
-                    name: title,
-                    warmUp: {
-                        isOn: true,
-                        duration: sec + min * 60,
-                        // soundEffect: require('../assets/sounds/Swoosh.mp3'),
-                        styles: {
-                            background: 'yellow'
-                        }
-                    },
-                    intervals: [
-                        {
-                            high: {
+                    await AsyncStorage.setItem(
+                        runningWorkout.name+'WORKOUT',
+                        JSON.stringify({
+                            name: runningWorkout.name,
+                            warmUp: {
                                 isOn: true,
-                                duration: highSec + highMin * 60,
-                                // soundEffect: require('../assets/sounds/alarm_2.mp3'),
+                                duration: sec + min * 60,
+                                // soundEffect: require('../assets/sounds/Swoosh.mp3'),
                                 styles: {
-                                    background: 'red'
+                                    background: 'yellow',
                                 }
                             },
-                            low: {
-                                isOn: true,
-                                duration: lowSec + lowMin * 60,
-                                // soundEffect: require('../assets/sounds/BeeperEmergencyCall.mp3'),
-                                styles: {
-                                    background: 'green'
-                                }
-                            },
-                            rest: {
-                                isOn: true,
-                                duration: cooldownSec + cooldownMin * 60,
-                                // soundEffect: require('../assets/sounds/finished.wav'),
-                                styles: {
-                                    background: 'blue'
-                                }
-                            },
-                            repeat
-                        }
-                    ]
-                }
-                
-            });
-                    // await AsyncStorage.setItem(
-                    //     title + 'WORKOUT',
-                    //     JSON.stringify({
-                    //         name: title,
-                    //         warmUp: {
-                    //             isOn: true,
-                    //             duration: sec + min * 60,
-                    //             // soundEffect: require('../assets/sounds/Swoosh.mp3'),
-                    //             styles: {
-                    //                 background: 'yellow',
-                    //             }
-                    //         },
-                    //         intervals: [{
-                    //             high: {
-                    //                 isOn: true,
-                    //                 duration: highSec + highMin * 60,
-                    //                 // soundEffect: require('../assets/sounds/alarm_2.mp3'),
-                    //                 styles: {
-                    //                     background: 'red',
-                    //                 }
-                    //             },
-                    //             low: {
-                    //                 isOn: true,
-                    //                 duration: lowSec + lowMin * 60,
-                    //                 // soundEffect: require('../assets/sounds/BeeperEmergencyCall.mp3'),
-                    //                 styles: {
-                    //                     background: 'green',
-                    //                 }
-                    //             },
-                    //             rest: {
-                    //                 isOn: true,
-                    //                 duration: cooldownSec + cooldownMin * 60,
-                    //                 // soundEffect: require('../assets/sounds/finished.wav'),
-                    //                 styles: {
-                    //                     background: 'blue',
-                    //                 }
-                    //             },
-                    //             repeat,
-                    //         }]
-                    //     }),
-                    //   );
-                    _retrieveData();
+                            intervals: [{
+                                high: {
+                                    isOn: true,
+                                    duration: highSec + highMin * 60,
+                                    // soundEffect: require('../assets/sounds/alarm_2.mp3'),
+                                    styles: {
+                                        background: 'red',
+                                    }
+                                },
+                                low: {
+                                    isOn: true,
+                                    duration: lowSec + lowMin * 60,
+                                    // soundEffect: require('../assets/sounds/BeeperEmergencyCall.mp3'),
+                                    styles: {
+                                        background: 'green',
+                                    }
+                                },
+                                rest: {
+                                    isOn: true,
+                                    duration: cooldownSec + cooldownMin * 60,
+                                    // soundEffect: require('../assets/sounds/finished.wav'),
+                                    styles: {
+                                        background: 'blue',
+                                    }
+                                },
+                                repeat,
+                            }]
+                        }),
+                      );
             } catch (error) {
-                await AsyncStorage.setItem(
-                    title,
-                    JSON.stringify({
-                        name: title,
-                        warmUp: {
-                            isOn: true,
-                            duration: sec + min * 60,
-                            // soundEffect: require('../assets/sounds/Swoosh.mp3'),
-                            styles: {
-                                background: 'yellow',
-                            }
-                        },
-                        intervals: [{
-                            high: {
-                                isOn: true,
-                                duration: highSec + highMin * 60,
-                                // soundEffect: require('../assets/sounds/alarm_2.mp3'),
-                                styles: {
-                                    background: 'red',
-                                }
-                            },
-                            low: {
-                                isOn: true,
-                                duration: lowSec + lowMin * 60,
-                                // soundEffect: require('../assets/sounds/BeeperEmergencyCall.mp3'),
-                                styles: {
-                                    background: 'green',
-                                }
-                            },
-                            rest: {
-                                isOn: true,
-                                duration: cooldownSec + cooldownMin * 60,
-                                // soundEffect: require('../assets/sounds/finished.wav'),
-                                styles: {
-                                    background: 'blue',
-                                }
-                            },
-                            repeat,
-                        }]
-                    }),
-                  );
-              console.log(error)
-              _retrieveData();
-            }
+               
+             
+              console.log(error);
+    
           };
+        }
     return (
         <>
             <Header
                 containerStyle={{ backgroundColor: 'skyblue' }}
                 leftComponent={{ icon: 'menu', color: '#000' }}
-                centerComponent={{ text: 'CREATE NEW WORKOUT', style: { color: '#000' } }}
+                centerComponent={{ text: runningWorkout.name, style: { color: '#000' } }}
                 rightComponent={<Icon
                     name='gear'
                     type='font-awesome'
@@ -208,18 +119,10 @@ const dispatch = useDispatch();
             <View style={
             { flex: 2, flexDirection: 'column', justifyContent: 'flex-start', backgroundColor: 'skyblue' }
             }>
-                <Input placeholder="WORKOUT NAME" onChangeText={value => setTitle(value)} value={title} />
+                {/* <Input placeholder="WORKOUT NAME" onChangeText={value => setTitle(value)} value={title} /> */}
                 <View style={showWarmUp ? { backgroundColor: 'skyblue' } : { flex: 1, flexDirection: 'column', justifyContent: 'flex-start', backgroundColor: 'skyblue' }} >
                     <Text>
                         WARM UP 
-                        
-                        {/* <Switch
-                            trackColor={{ false: "#767577", true: "#81b0ff" }}
-                            thumbColor={showWarmUp ? "#f5dd4b" : "#f4f3f4"}
-                            ios_backgroundColor="#3e3e3e"
-                            onValueChange={toggleSwitchWarmUp}
-                            value={showWarmUp}
-                        />  */}
                         {moment().hour(0).minute(+minutes).second(+seconds).format('mm : ss').toString()}
                         <Text onPress={toggleSwitchWarmUp}>Edit</Text>
                     </Text>
