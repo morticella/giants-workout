@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, FlatList, AsyncStorage, StyleSheet } from "react-native"
+import { View, Text, FlatList, StyleSheet } from "react-native"
 import { Header, Icon } from 'react-native-elements'
 import { useSelector, useDispatch } from 'react-redux';
 import { IWorkout } from 'mocks/workout';
@@ -8,42 +8,18 @@ import { WORKOUT_TIMER } from '../assets/constants';
 interface IProps {
     menuCallback(): void,
 }
-let list: { key: string }[] = [];
-let listStore: string[] = [];
-// AsyncStorage.clear();
-export const workouts = async () => {
-    console.log('triggered');
-    list = [];
-    listStore = [];
-    await AsyncStorage.getAllKeys((err, keys) => {
-        AsyncStorage.multiGet(keys as string[], (err, stores) => {
-            if (!stores) {
-                return;
-            }
-            stores.map((result, i, store) => {
-                if (store[i][0].includes('WORKOUT')) {
-                    listStore.push(store[i][1]);
-                }
-
-            });
-        });
-    });
-    return { listStore, list };
+interface IState {
+    workouts: { workouts: IWorkout[] }
 }
 export const Home: React.FC<IProps> = (props: IProps) => {
     const dispatch = useDispatch();
-    const persistWorkouts = useSelector(state => state?.workouts?.workouts)
+    const persistWorkouts: IWorkout[] = useSelector((state:IState) => state?.workouts?.workouts)
     useEffect(() => {
-        // workouts();
-        setTimeout(() => {
-            dispatch({ type: 'fetchWorkouts', workouts: persistWorkouts });
-        }, 200);
+        dispatch({ type: 'fetchWorkouts', workouts: persistWorkouts });
     }, []);
 
-    const workoutsState: IWorkout[] = useSelector(state => state?.workouts?.workouts) || [];
-
     const runningWorkout: Function = (workoutName: string): IWorkout | void  => {
-        workoutsState.map((workout: IWorkout) => {
+        persistWorkouts.map((workout: IWorkout) => {
             if (workout.name === workoutName) {
                 console.log('->', workout);
                 dispatch({ type: 'loadWorkout', workouts: workout });
@@ -51,11 +27,10 @@ export const Home: React.FC<IProps> = (props: IProps) => {
             }
         })
     };
-    useSelector(state => console.log(state));
 
     const test: any[] = [];
 
-    workoutsState.map((workout: IWorkout) => {
+    persistWorkouts.map((workout: IWorkout) => {
         test.push({ key: workout.name })
     })
 

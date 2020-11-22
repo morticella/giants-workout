@@ -4,13 +4,8 @@ export function workouts(state = {
     workouts: [],
     runningWorkout : {}
 }, action : any) {
-    const normalizeWorkouts = action.workouts;
-    const finalWorkouts: string[] = [];
     switch (action.type) {
-        case 'fetchWorkouts': 
-        // normalizeWorkouts.map((workout : string) => {
-        //         finalWorkouts.push(JSON.parse(workout));
-        //     });
+        case 'fetchWorkouts':
             return {
                 ...state,
                 workouts: action.workouts
@@ -21,7 +16,6 @@ export function workouts(state = {
                 runningWorkout: action.workouts
             }
         case 'createWorkout':
-
             return {
                 ...state,
                 workouts: [
