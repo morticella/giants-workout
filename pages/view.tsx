@@ -7,7 +7,7 @@ import { Home } from './home';
 import { Overlay } from 'react-native-elements';
 import { StartButton } from '../components/start-button';
 import { View, StyleSheet } from 'react-native';
-import { HOME, WORKOUT_CREATE, WORKOUT_TIMER, WORKOUT_EDIT } from '../assets/constants';
+import { PAGE_HOME, PAGE_CREATE_WORKOUT, PAGE_TIMER_WORKOUT, PAGE_EDIT_WORKOUT } from '../assets/constants';
 import { WorkoutEdit } from './workout-edit';
 
 interface IGlobalState {
@@ -18,10 +18,10 @@ export default function AppView() {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch({ type: HOME });
+    dispatch({ type: PAGE_HOME });
   }, []);
   const page: string = useSelector((state: IGlobalState) => state?.navigation?.name);
- useSelector(state => console.log('>>> ', state));
+
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -38,41 +38,41 @@ export default function AppView() {
 
   return (
     <>
-      {page === HOME && !isVisible && <Home menuCallback={() => {
+      {page === PAGE_HOME && !isVisible && <Home menuCallback={() => {
         setIsVisible(true);
-        dispatch({ type: HOME });
+        dispatch({ type: PAGE_HOME });
       }} />}
-      {page === WORKOUT_TIMER && !isVisible && <WorkoutTimer menuCallback={() => {
+      {page === PAGE_TIMER_WORKOUT && !isVisible && <WorkoutTimer menuCallback={() => {
         setIsVisible(true);
-        dispatch({ type: WORKOUT_TIMER })
+        dispatch({ type: PAGE_TIMER_WORKOUT })
       }} />}
-      {page === WORKOUT_CREATE && !isVisible && <WorkoutCreate menuCallback={() => {
+      {page === PAGE_CREATE_WORKOUT && !isVisible && <WorkoutCreate menuCallback={() => {
         setIsVisible(true);
-        dispatch({ type: WORKOUT_CREATE })
+        dispatch({ type: PAGE_CREATE_WORKOUT })
       }} />}
-      {page === WORKOUT_EDIT && !isVisible && <WorkoutEdit menuCallback={() => {
+      {page === PAGE_EDIT_WORKOUT && !isVisible && <WorkoutEdit menuCallback={() => {
         setIsVisible(true);
-        dispatch({ type: WORKOUT_EDIT })
+        dispatch({ type: PAGE_EDIT_WORKOUT })
       }} />}
       {isVisible && <View style={styles.container}>
         <Overlay isVisible={isVisible} fullScreen={true} onBackdropPress={() => {
           setIsVisible(false);
         }}>
           <View style={styles.container}>
-            <StartButton label={HOME} start={0} callback={() => {
+            <StartButton label={PAGE_HOME} start={0} callback={() => {
               setIsVisible(false);
-              dispatch({ type: HOME });
+              dispatch({ type: PAGE_HOME });
             }} />
             <StartButton label={'WORKOUT'} start={0} callback={() => {
-              dispatch({ type: WORKOUT_TIMER })
+              dispatch({ type: PAGE_TIMER_WORKOUT })
               setIsVisible(false);
             }} />
             <StartButton label={'CREATE WORKOUT'} start={0} callback={() => {
-              dispatch({ type: WORKOUT_CREATE })
+              dispatch({ type: PAGE_CREATE_WORKOUT })
               setIsVisible(false);
             }} />
             <StartButton label={'EDIT WORKOUT'} start={0} callback={() => {
-              dispatch({ type: WORKOUT_EDIT })
+              dispatch({ type: PAGE_EDIT_WORKOUT })
               setIsVisible(false);
             }} />
           </View>

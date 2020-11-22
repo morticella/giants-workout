@@ -1,29 +1,29 @@
-import {HOME, WORKOUT_CREATE, WORKOUT_TIMER, WORKOUT_EDIT} from '../../assets/constants'
+import {PAGE_HOME, PAGE_CREATE_WORKOUT, PAGE_TIMER_WORKOUT, PAGE_EDIT_WORKOUT} from '../../assets/constants'
 export function navigation(state = {
     page : {
-        name: HOME
+        name: PAGE_HOME
     }
 }, action: any) {
     switch (action.type) {
-        case HOME:
+        case PAGE_HOME:
             return {
-                name: HOME
+                name: PAGE_HOME
             }
-        case WORKOUT_EDIT:
+        case PAGE_EDIT_WORKOUT:
             return {
-                name: WORKOUT_EDIT
+                name: PAGE_EDIT_WORKOUT
             }
-        case WORKOUT_CREATE:
+        case PAGE_CREATE_WORKOUT:
             return {
-                name: WORKOUT_CREATE
+                name: PAGE_CREATE_WORKOUT
             }
-        case WORKOUT_TIMER:
+        case PAGE_TIMER_WORKOUT:
             return {
-                name: WORKOUT_TIMER
+                name: PAGE_TIMER_WORKOUT
             }
-        case WORKOUT_EDIT:
+        case PAGE_EDIT_WORKOUT:
             return {
-                name: WORKOUT_EDIT
+                name: PAGE_EDIT_WORKOUT
             }
         default:
             return state

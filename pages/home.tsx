@@ -3,7 +3,7 @@ import { View, Text, FlatList, StyleSheet } from "react-native"
 import { Header, Icon } from 'react-native-elements'
 import { useSelector, useDispatch } from 'react-redux';
 import { IWorkout } from 'mocks/workout';
-import { WORKOUT_TIMER } from '../assets/constants';
+import { PAGE_TIMER_WORKOUT, LOAD_RUNNING_WORKOUT_SUCCESS, FETCH_WORKOUTS_SUCCESS } from '../assets/constants';
 
 interface IProps {
     menuCallback(): void,
@@ -13,16 +13,15 @@ interface IState {
 }
 export const Home: React.FC<IProps> = (props: IProps) => {
     const dispatch = useDispatch();
-    const persistWorkouts: IWorkout[] = useSelector((state:IState) => state?.workouts?.workouts)
+    const persistWorkouts: IWorkout[] = useSelector((state:IState) => state.workouts.workouts)
     useEffect(() => {
-        dispatch({ type: 'fetchWorkouts', workouts: persistWorkouts });
+        dispatch({ type: FETCH_WORKOUTS_SUCCESS, workouts: persistWorkouts });
     }, []);
 
     const runningWorkout: Function = (workoutName: string): IWorkout | void  => {
         persistWorkouts.map((workout: IWorkout) => {
             if (workout.name === workoutName) {
-                console.log('->', workout);
-                dispatch({ type: 'loadWorkout', workouts: workout });
+                dispatch({ type: LOAD_RUNNING_WORKOUT_SUCCESS, workouts: workout });
                 return workout
             }
         })
@@ -49,15 +48,14 @@ export const Home: React.FC<IProps> = (props: IProps) => {
         <>
             <Header
                 leftComponent={{ icon: 'menu', color: '#fff' }}
-                centerComponent={{ text: 'MY TITLE', style: { color: '#fff' } }}
+                centerComponent={{ text: 'GIANT WORKOUT', style: { color: '#fff' } }}
                 rightComponent={<Icon
-                    name='gear'
+                    name='list'
                     type='font-awesome'
                     color='#fff'
                     backgroundColor='trasparent'
                     onPress={props.menuCallback} />}
             />
-
             <View>
                 <FlatList
                     data={test}
@@ -68,11 +66,10 @@ export const Home: React.FC<IProps> = (props: IProps) => {
                     backgroundColor='trasparent'
                     onPress={() => {
                         runningWorkout(item.key);
-                        dispatch({type: WORKOUT_TIMER})
+                        dispatch({type: PAGE_TIMER_WORKOUT})
                     }} /></Text>}
                 />
             </View>
-
         </>
     )
 }

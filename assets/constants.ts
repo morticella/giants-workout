@@ -1,4 +1,12 @@
-export const HOME = 'HOME';
-export const WORKOUT_EDIT = 'EDIT';
-export const WORKOUT_TIMER = 'WORKOUT_TIMER';
-export const WORKOUT_CREATE = 'WORKOUT_CREATE';
+/*
+* @ reducers actions constants
+*/
+
+export const PAGE_HOME = 'PAGE_HOME';
+export const PAGE_EDIT_WORKOUT = 'PAGE_EDIT_WORKOUT';
+export const PAGE_TIMER_WORKOUT = 'PAGE_TIMER_WORKOUT';
+export const PAGE_CREATE_WORKOUT = 'PAGE_CREATE_WORKOUT';
+
+export const CREATE_WORKOUT_SUCCESS = 'CREATE_WORKOUT_SUCCESS';
+export const FETCH_WORKOUTS_SUCCESS = 'FETCH_WORKOUTS_SUCCESS';
+export const LOAD_RUNNING_WORKOUT_SUCCESS = 'LOAD_RUNNING_WORKOUT_SUCCESS';
