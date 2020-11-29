@@ -6,7 +6,7 @@ import { WorkoutCreate } from './workout-create';
 import { Home } from './home';
 import { Overlay } from 'react-native-elements';
 import { StartButton } from '../components/start-button';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, AsyncStorage } from 'react-native';
 import { PAGE_HOME, PAGE_CREATE_WORKOUT, PAGE_TIMER_WORKOUT, PAGE_EDIT_WORKOUT } from '../assets/constants';
 import { WorkoutEdit } from './workout-edit';
 
@@ -35,7 +35,7 @@ export default function AppView() {
       fontWeight: '400',
     }
   });
-
+  // AsyncStorage.clear();
   return (
     <>
       {page === PAGE_HOME && !isVisible && <Home menuCallback={() => {

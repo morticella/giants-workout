@@ -2,8 +2,14 @@ import React, { useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet } from "react-native"
 import { Header, Icon } from 'react-native-elements'
 import { useSelector, useDispatch } from 'react-redux';
-import { IWorkout } from 'mocks/workout';
-import { PAGE_TIMER_WORKOUT, LOAD_RUNNING_WORKOUT_SUCCESS, FETCH_WORKOUTS_SUCCESS } from '../assets/constants';
+import { IWorkout } from '../mocks/workout';
+import {
+    PAGE_TIMER_WORKOUT,
+    LOAD_RUNNING_WORKOUT_SUCCESS,
+    FETCH_WORKOUTS_SUCCESS,
+    DELETE_WORKOUT_SUCCESS,
+    PAGE_HOME
+} from '../assets/constants';
 
 interface IProps {
     menuCallback(): void,
@@ -13,12 +19,12 @@ interface IState {
 }
 export const Home: React.FC<IProps> = (props: IProps) => {
     const dispatch = useDispatch();
-    const persistWorkouts: IWorkout[] = useSelector((state:IState) => state.workouts.workouts)
+    const persistWorkouts: IWorkout[] = useSelector((state: IState) => state.workouts.workouts)
     useEffect(() => {
         dispatch({ type: FETCH_WORKOUTS_SUCCESS, workouts: persistWorkouts });
     }, []);
 
-    const runningWorkout: Function = (workoutName: string): IWorkout | void  => {
+    const runningWorkout: Function = (workoutName: string): IWorkout | void => {
         persistWorkouts.map((workout: IWorkout) => {
             if (workout.name === workoutName) {
                 dispatch({ type: LOAD_RUNNING_WORKOUT_SUCCESS, workouts: workout });
@@ -27,10 +33,19 @@ export const Home: React.FC<IProps> = (props: IProps) => {
         })
     };
 
-    const test: any[] = [];
+    const deleteWorkout: Function = (workoutName: string): IWorkout | void => {
+        persistWorkouts.map((workout: IWorkout) => {
+            if (workout.name === workoutName) {
+                dispatch({ type: DELETE_WORKOUT_SUCCESS, workout: workout });
+                return workout
+            }
+        })
+    };
+
+    const workoutsList: any[] = [];
 
     persistWorkouts.map((workout: IWorkout) => {
-        test.push({ key: workout.name })
+        workoutsList.push({ key: workout.name })
     })
 
     const styles = StyleSheet.create({
@@ -58,16 +73,25 @@ export const Home: React.FC<IProps> = (props: IProps) => {
             />
             <View>
                 <FlatList
-                    data={test}
+                    data={workoutsList}
                     renderItem={({ item }) => <Text style={styles.item}>{item.key} <Icon
-                    name='chevron-right'
-                    type='font-awesome'
-                    color='#000'
-                    backgroundColor='trasparent'
-                    onPress={() => {
-                        runningWorkout(item.key);
-                        dispatch({type: PAGE_TIMER_WORKOUT})
-                    }} /></Text>}
+                        name='chevron-right'
+                        type='font-awesome'
+                        color='#000'
+                        backgroundColor='trasparent'
+                        onPress={() => {
+                            runningWorkout(item.key);
+                            dispatch({ type: PAGE_TIMER_WORKOUT })
+                        }} />
+                        <Icon
+                        name='trash'
+                        type='font-awesome'
+                        color='#000'
+                        backgroundColor='trasparent'
+                        onPress={() => {
+                            deleteWorkout(item.key);
+                            dispatch({ type: PAGE_HOME })
+                        }} /></Text>}
                 />
             </View>
         </>

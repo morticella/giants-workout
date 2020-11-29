@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, AsyncStorage, Switch, Picker, Slider } from "react-native";
-import { Header, Icon, Input } from 'react-native-elements';
+import { View, Text, Switch, Picker, Slider } from "react-native";
+import { Header, Icon } from 'react-native-elements';
 import Moment from 'moment';
 import { extendMoment } from 'moment-range';
-import { useSelector } from 'react-redux';
-import { IWorkout, workoutSettigs } from 'mocks/workout';
+import { useSelector, useDispatch } from 'react-redux';
+import { IWorkout } from '../mocks/workout';
+import { PAGE_TIMER_WORKOUT, EDIT_WORKOUT_SUCCESS } from '../assets/constants';
 
 const moment = extendMoment(Moment);
 
@@ -16,7 +17,8 @@ interface IState {
     workouts: { runningWorkout: IWorkout }
 }
 export const WorkoutEdit: React.FC<IProps> = (props: IProps) => {
-    const runningWorkout: IWorkout = useSelector((state:IState) => state.workouts.runningWorkout)
+    const runningWorkout: IWorkout = useSelector((state: IState) => state.workouts.runningWorkout);
+    const dispatch = useDispatch();
 
     const secondsValue = [];
     for (let i = 0; i < 60; i++) {
@@ -39,7 +41,7 @@ export const WorkoutEdit: React.FC<IProps> = (props: IProps) => {
     const toggleLow = () => setShowLow(previousState => !previousState);
     const toggleRepeat = () => setShowRepeat(previousState => !previousState);
     const toggleCooldown = () => setShowCooldown(previousState => !previousState);
-    
+
     const [seconds, setSeconds] = useState(runningWorkout.warmUp.duration.toString());
     const [minutes, setMinutes] = useState('00');
     const [sec, setSec] = useState(runningWorkout.warmUp.duration);
@@ -47,62 +49,64 @@ export const WorkoutEdit: React.FC<IProps> = (props: IProps) => {
     const [cycle, setCycle] = useState(0);
     const [highSec, setHighSec] = useState(runningWorkout.intervals[0].high.duration);
     const [highMin, setHighMin] = useState(0);
-    const [lowSec, setLowSec] =  useState(runningWorkout.intervals[0].low.duration);
-    const [lowMin, setLowMin] =  useState(0);
-    const [repeat, setRepeat] =  useState(runningWorkout.intervals[0].repeat);
-    const [cooldownSec, setCooldownSec] =  useState(runningWorkout.intervals[0].rest.duration);
-    const [cooldownMin, setCooldownMin] =  useState(0);
+    const [lowSec, setLowSec] = useState(runningWorkout.intervals[0].low.duration);
+    const [lowMin, setLowMin] = useState(0);
+    const [repeat, setRepeat] = useState(runningWorkout.intervals[0].repeat);
+    const [cooldownSec, setCooldownSec] = useState(runningWorkout.intervals[0].rest.duration);
+    const [cooldownMin, setCooldownMin] = useState(0);
 
     const handleSave = async () => {
-            try {
-                    await AsyncStorage.setItem(
-                        runningWorkout.name+'WORKOUT',
-                        JSON.stringify({
-                            name: runningWorkout.name,
-                            warmUp: {
+        try {
+            dispatch({
+                type: EDIT_WORKOUT_SUCCESS, workout: {
+                    name: runningWorkout.name,
+                    warmUp: {
+                        isOn: true,
+                        duration: sec + min * 60,
+                        // soundEffect: require('../assets/sounds/Swoosh.mp3'),
+                        styles: {
+                            background: 'yellow'
+                        }
+                    },
+                    intervals: [
+                        {
+                            high: {
                                 isOn: true,
-                                duration: sec + min * 60,
-                                // soundEffect: require('../assets/sounds/Swoosh.mp3'),
+                                duration: highSec + highMin * 60,
+                                // soundEffect: require('../assets/sounds/alarm_2.mp3'),
                                 styles: {
-                                    background: 'yellow',
+                                    background: 'red'
                                 }
                             },
-                            intervals: [{
-                                high: {
-                                    isOn: true,
-                                    duration: highSec + highMin * 60,
-                                    // soundEffect: require('../assets/sounds/alarm_2.mp3'),
-                                    styles: {
-                                        background: 'red',
-                                    }
-                                },
-                                low: {
-                                    isOn: true,
-                                    duration: lowSec + lowMin * 60,
-                                    // soundEffect: require('../assets/sounds/BeeperEmergencyCall.mp3'),
-                                    styles: {
-                                        background: 'green',
-                                    }
-                                },
-                                rest: {
-                                    isOn: true,
-                                    duration: cooldownSec + cooldownMin * 60,
-                                    // soundEffect: require('../assets/sounds/finished.wav'),
-                                    styles: {
-                                        background: 'blue',
-                                    }
-                                },
-                                repeat,
-                            }]
-                        }),
-                      );
-            } catch (error) {
-               
-             
-              console.log(error);
-    
-          };
-        }
+                            low: {
+                                isOn: true,
+                                duration: lowSec + lowMin * 60,
+                                // soundEffect: require('../assets/sounds/BeeperEmergencyCall.mp3'),
+                                styles: {
+                                    background: 'green'
+                                }
+                            },
+                            rest: {
+                                isOn: true,
+                                duration: cooldownSec + cooldownMin * 60,
+                                // soundEffect: require('../assets/sounds/finished.wav'),
+                                styles: {
+                                    background: 'blue'
+                                }
+                            },
+                            repeat
+                        }
+                    ]
+                }
+            });
+            dispatch({ type: PAGE_TIMER_WORKOUT });
+        } catch (error) {
+
+
+            console.log(error);
+
+        };
+    }
     return (
         <>
             <Header
@@ -117,12 +121,12 @@ export const WorkoutEdit: React.FC<IProps> = (props: IProps) => {
                     onPress={props.menuCallback} />}
             />
             <View style={
-            { flex: 2, flexDirection: 'column', justifyContent: 'flex-start', backgroundColor: 'skyblue' }
+                { flex: 2, flexDirection: 'column', justifyContent: 'flex-start', backgroundColor: 'skyblue' }
             }>
                 {/* <Input placeholder="WORKOUT NAME" onChangeText={value => setTitle(value)} value={title} /> */}
                 <View style={showWarmUp ? { backgroundColor: 'skyblue' } : { flex: 1, flexDirection: 'column', justifyContent: 'flex-start', backgroundColor: 'skyblue' }} >
                     <Text>
-                        WARM UP 
+                        WARM UP
                         {moment().hour(0).minute(+minutes).second(+seconds).format('mm : ss').toString()}
                         <Text onPress={toggleSwitchWarmUp}>Edit</Text>
                     </Text>
@@ -132,27 +136,27 @@ export const WorkoutEdit: React.FC<IProps> = (props: IProps) => {
                     style={{ flexDirection: 'row', height: 20, alignItems: 'stretch', justifyContent: 'center' }}
                 >
                     <Text>Seconds</Text>
-                    </View>
+                </View>
                     <View style={{ flexDirection: 'row', height: 40, alignItems: 'stretch', justifyContent: 'center' }}
                     >
-                    <Slider
-                        value={sec}
-                        onValueChange={(value) => {
-                            setSec(value);
-                            setSeconds(value.toString());
-                        }}
-                        maximumValue={59}
-                        minimumValue={0}
-                        step={1}
-                        style={{ width: '90%' }}
-                    />
-                </View>
+                        <Slider
+                            value={sec}
+                            onValueChange={(value) => {
+                                setSec(value);
+                                setSeconds(value.toString());
+                            }}
+                            maximumValue={59}
+                            minimumValue={0}
+                            step={1}
+                            style={{ width: '90%' }}
+                        />
+                    </View>
                     <View
                         style={{ flexDirection: 'row', height: 20, alignItems: 'stretch', justifyContent: 'center' }}
                     >
                         <Text>Minutes</Text>
-                        </View>
-                        <View
+                    </View>
+                    <View
                         style={{ flexDirection: 'row', height: 40, alignItems: 'stretch', justifyContent: 'center' }}
                     >
                         <Slider
@@ -170,63 +174,63 @@ export const WorkoutEdit: React.FC<IProps> = (props: IProps) => {
 
                 <View style={{ flex: 1, backgroundColor: 'powderblue', flexDirection: 'row', justifyContent: 'space-between' }} >
                     <Text>INTERVAL CYCLE {cycle} <Icon
-                    name='edit'
-                    type='font-awesome'
-                    color='#000'
-                    backgroundColor='trasparent'
-                    onPress={toggleCycle}
-                    /></Text> 
+                        name='edit'
+                        type='font-awesome'
+                        color='#000'
+                        backgroundColor='trasparent'
+                        onPress={toggleCycle}
+                    /></Text>
                 </View>
                 {showCycle && <View
-                        style={{ flexDirection: 'row', height: 40, alignItems: 'stretch', justifyContent: 'center' }}
-                    >
-                        <Slider
-                            value={cycle}
-                            onValueChange={(value) => {
-                                setCycle(value);
-                                // setMinutes(value.toString());
-                            }}
-                            maximumValue={99}
-                            minimumValue={0}
-                            step={1}
-                            style={{ width: '90%' }}
-                        />
-                    </View>}
+                    style={{ flexDirection: 'row', height: 40, alignItems: 'stretch', justifyContent: 'center' }}
+                >
+                    <Slider
+                        value={cycle}
+                        onValueChange={(value) => {
+                            setCycle(value);
+                            // setMinutes(value.toString());
+                        }}
+                        maximumValue={99}
+                        minimumValue={0}
+                        step={1}
+                        style={{ width: '90%' }}
+                    />
+                </View>}
                 <View style={{ flex: 1, backgroundColor: 'powderblue', flexDirection: 'row', }} >
                     <Text>High {moment().hour(0).minute(highMin).second(highSec).format('mm : ss').toString()} <Icon
-                    name='edit'
-                    type='font-awesome'
-                    color='#000'
-                    backgroundColor='trasparent'
-                    onPress={toggleHigh}
+                        name='edit'
+                        type='font-awesome'
+                        color='#000'
+                        backgroundColor='trasparent'
+                        onPress={toggleHigh}
                     /></Text><Text>Low {moment().hour(0).minute(lowMin).second(lowSec).format('mm : ss').toString()} <Icon
-                    name='edit'
-                    type='font-awesome'
-                    color='#000'
-                    backgroundColor='trasparent'
-                    onPress={toggleLow}
+                        name='edit'
+                        type='font-awesome'
+                        color='#000'
+                        backgroundColor='trasparent'
+                        onPress={toggleLow}
                     /></Text>
                 </View>
                 {showHigh && <><View
                     style={{ flexDirection: 'row', height: 20 }}
                 >
                     <Slider
-                            value={highSec}
-                            onValueChange={(value) => {
-                                setHighSec(value);
-                                // setMinutes(value.toString());
-                            }}
-                            maximumValue={59}
-                            minimumValue={0}
-                            step={1}
-                            style={{ width: '90%' }}
-                        />
-                    
-                    </View>
+                        value={highSec}
+                        onValueChange={(value) => {
+                            setHighSec(value);
+                            // setMinutes(value.toString());
+                        }}
+                        maximumValue={59}
+                        minimumValue={0}
+                        step={1}
+                        style={{ width: '90%' }}
+                    />
+
+                </View>
                     <View
-                    style={{ flexDirection: 'row', height: 20 }}
-                >
-                    <Slider
+                        style={{ flexDirection: 'row', height: 20 }}
+                    >
+                        <Slider
                             value={highMin}
                             onValueChange={(value) => {
                                 setHighMin(value);
@@ -237,29 +241,29 @@ export const WorkoutEdit: React.FC<IProps> = (props: IProps) => {
                             step={1}
                             style={{ width: '90%' }}
                         />
-                    
+
                     </View>
-                    </>}
-                    {showLow && <><View
+                </>}
+                {showLow && <><View
                     style={{ flexDirection: 'row', height: 20 }}
                 >
                     <Slider
-                            value={lowSec}
-                            onValueChange={(value) => {
-                                setLowSec(value);
-                                // setMinutes(value.toString());
-                            }}
-                            maximumValue={59}
-                            minimumValue={0}
-                            step={1}
-                            style={{ width: '90%' }}
-                        />
-                    
-                    </View>
+                        value={lowSec}
+                        onValueChange={(value) => {
+                            setLowSec(value);
+                            // setMinutes(value.toString());
+                        }}
+                        maximumValue={59}
+                        minimumValue={0}
+                        step={1}
+                        style={{ width: '90%' }}
+                    />
+
+                </View>
                     <View
-                    style={{ flexDirection: 'row', height: 20 }}
-                >
-                    <Slider
+                        style={{ flexDirection: 'row', height: 20 }}
+                    >
+                        <Slider
                             value={lowMin}
                             onValueChange={(value) => {
                                 setLowMin(value);
@@ -270,9 +274,9 @@ export const WorkoutEdit: React.FC<IProps> = (props: IProps) => {
                             step={1}
                             style={{ width: '90%' }}
                         />
-                    
+
                     </View>
-                    </>}
+                </>}
                 <Text>
                     REPEAT <Switch
                         trackColor={{ false: "#767577", true: "#81b0ff" }}
@@ -286,23 +290,23 @@ export const WorkoutEdit: React.FC<IProps> = (props: IProps) => {
                         color='#000'
                         backgroundColor='trasparent'
                         onPress={toggleRepeat}
-                        /></>} 
+                    /></>}
                 </Text>
                 {showRepeat && <View
-                        style={{ flexDirection: 'row', height: 40, alignItems: 'stretch', justifyContent: 'center' }}
-                    >
-                        <Slider
-                            value={repeat}
-                            onValueChange={(value) => {
-                                setRepeat(value);
-                                // setMinutes(value.toString());
-                            }}
-                            maximumValue={99}
-                            minimumValue={0}
-                            step={1}
-                            style={{ width: '90%' }}
-                        />
-                    </View>}
+                    style={{ flexDirection: 'row', height: 40, alignItems: 'stretch', justifyContent: 'center' }}
+                >
+                    <Slider
+                        value={repeat}
+                        onValueChange={(value) => {
+                            setRepeat(value);
+                            // setMinutes(value.toString());
+                        }}
+                        maximumValue={99}
+                        minimumValue={0}
+                        step={1}
+                        style={{ width: '90%' }}
+                    />
+                </View>}
                 <View style={{ flex: 1, backgroundColor: 'steelblue' }}>
                     <Text>
                         COOLDOWN <Switch
@@ -312,39 +316,39 @@ export const WorkoutEdit: React.FC<IProps> = (props: IProps) => {
                             onValueChange={toggleSwitch}
                             value={isEnabled}
                         /> {moment().hour(0).minute(cooldownMin).second(cooldownSec).format('mm : ss').toString()} <Icon
-                        name='edit'
-                        type='font-awesome'
-                        color='#000'
-                        backgroundColor='trasparent'
-                        onPress={toggleCooldown}
+                            name='edit'
+                            type='font-awesome'
+                            color='#000'
+                            backgroundColor='trasparent'
+                            onPress={toggleCooldown}
                         />
 
-                </Text>
+                    </Text>
                 </View>
                 {showCooldown && <><View
                     style={{ flexDirection: 'row', height: 20 }}
                 >
                     <Slider
-                            value={lowSec}
-                            onValueChange={(value) => {
-                                setCooldownSec(value);
-                                // setMinutes(value.toString());
-                            }}
-                            maximumValue={59}
-                            minimumValue={0}
-                            step={1}
-                            style={{ width: '90%' }}
-                        />
-                    
-                    </View>
+                        value={lowSec}
+                        onValueChange={(value) => {
+                            setCooldownSec(value);
+                            // setMinutes(value.toString());
+                        }}
+                        maximumValue={59}
+                        minimumValue={0}
+                        step={1}
+                        style={{ width: '90%' }}
+                    />
+
+                </View>
                     <View
-                    style={{ flexDirection: 'row', height: 20 }}
-                >
-                    <Slider
+                        style={{ flexDirection: 'row', height: 20 }}
+                    >
+                        <Slider
                             value={lowMin}
                             onValueChange={(value) => {
                                 setCooldownMin(value);
-                                
+
                                 // setMinutes(value.toString());
                             }}
                             maximumValue={59}
@@ -352,16 +356,16 @@ export const WorkoutEdit: React.FC<IProps> = (props: IProps) => {
                             step={1}
                             style={{ width: '90%' }}
                         />
-                    
+
                     </View>
-                    </>}
-                    <Icon
-                        name='save'
-                        type='font-awesome'
-                        color='#000'
-                        backgroundColor='trasparent'
-                        onPress={handleSave}
-                        />
+                </>}
+                <Icon
+                    name='save'
+                    type='font-awesome'
+                    color='#000'
+                    backgroundColor='trasparent'
+                    onPress={handleSave}
+                />
             </View>
         </>
     )

@@ -1,9 +1,10 @@
-import {combineReducers} from 'redux';
+import { combineReducers } from 'redux';
+import { AsyncStorage } from 'react-native';
+import { persistReducer } from 'redux-persist';
 
 import { workouts } from './workouts';
 import { navigation } from './navigation';
-import { AsyncStorage } from 'react-native';
-import { persistReducer } from 'redux-persist';
+
 const workouttConfig = {
   key: 'workout',
   storage: AsyncStorage,

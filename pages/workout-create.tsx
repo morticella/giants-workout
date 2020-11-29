@@ -4,6 +4,7 @@ import { Header, Icon, Input } from 'react-native-elements';
 import Moment from 'moment';
 import { extendMoment } from 'moment-range';
 import { useDispatch } from 'react-redux';
+import { CREATE_WORKOUT_SUCCESS, PAGE_HOME } from "../assets/constants";
 
 const moment = extendMoment(Moment);
 
@@ -62,7 +63,7 @@ export const WorkoutCreate: React.FC<IProps> = (props: IProps) => {
 const dispatch = useDispatch();
     const handleSave = async () => {
             try {
-                dispatch({ type: 'createWorkout', workouts: {
+                dispatch({ type: CREATE_WORKOUT_SUCCESS, workouts: {
                     name: title,
                     warmUp: {
                         isOn: true,
@@ -101,9 +102,9 @@ const dispatch = useDispatch();
                             repeat
                         }
                     ]
-                }
-                
-            });
+                }});
+
+                dispatch({type: PAGE_HOME})
                     // await AsyncStorage.setItem(
                     //     title + 'WORKOUT',
                     //     JSON.stringify({
@@ -147,48 +148,48 @@ const dispatch = useDispatch();
                     //   );
                     _retrieveData();
             } catch (error) {
-                await AsyncStorage.setItem(
-                    title,
-                    JSON.stringify({
-                        name: title,
-                        warmUp: {
-                            isOn: true,
-                            duration: sec + min * 60,
-                            // soundEffect: require('../assets/sounds/Swoosh.mp3'),
-                            styles: {
-                                background: 'yellow',
-                            }
-                        },
-                        intervals: [{
-                            high: {
-                                isOn: true,
-                                duration: highSec + highMin * 60,
-                                // soundEffect: require('../assets/sounds/alarm_2.mp3'),
-                                styles: {
-                                    background: 'red',
-                                }
-                            },
-                            low: {
-                                isOn: true,
-                                duration: lowSec + lowMin * 60,
-                                // soundEffect: require('../assets/sounds/BeeperEmergencyCall.mp3'),
-                                styles: {
-                                    background: 'green',
-                                }
-                            },
-                            rest: {
-                                isOn: true,
-                                duration: cooldownSec + cooldownMin * 60,
-                                // soundEffect: require('../assets/sounds/finished.wav'),
-                                styles: {
-                                    background: 'blue',
-                                }
-                            },
-                            repeat,
-                        }]
-                    }),
-                  );
-              console.log(error)
+            //     await AsyncStorage.setItem(
+            //         title,
+            //         JSON.stringify({
+            //             name: title,
+            //             warmUp: {
+            //                 isOn: true,
+            //                 duration: sec + min * 60,
+            //                 // soundEffect: require('../assets/sounds/Swoosh.mp3'),
+            //                 styles: {
+            //                     background: 'yellow',
+            //                 }
+            //             },
+            //             intervals: [{
+            //                 high: {
+            //                     isOn: true,
+            //                     duration: highSec + highMin * 60,
+            //                     // soundEffect: require('../assets/sounds/alarm_2.mp3'),
+            //                     styles: {
+            //                         background: 'red',
+            //                     }
+            //                 },
+            //                 low: {
+            //                     isOn: true,
+            //                     duration: lowSec + lowMin * 60,
+            //                     // soundEffect: require('../assets/sounds/BeeperEmergencyCall.mp3'),
+            //                     styles: {
+            //                         background: 'green',
+            //                     }
+            //                 },
+            //                 rest: {
+            //                     isOn: true,
+            //                     duration: cooldownSec + cooldownMin * 60,
+            //                     // soundEffect: require('../assets/sounds/finished.wav'),
+            //                     styles: {
+            //                         background: 'blue',
+            //                     }
+            //                 },
+            //                 repeat,
+            //             }]
+            //         }),
+            //       );
+            //   console.log(error)
               _retrieveData();
             }
           };
